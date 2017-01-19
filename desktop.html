@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Desktop</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      #sessionId {
+        font-size: 100px;
+        font-family: monospace;
+        color: #cecece;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sessionId">
+      <script type="text/javascript">
+        var code = []
+        while(code.length < 5){
+          code.push(Math.ceil(Math.random()*9));
+        }
+        code = code.join("");
+        document.write(code);
+      </script>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
+    <script>
+      var socket = io();
+      socket.on('connect', function() {
+         socket.emit('newRoom', code);
+      });
+      socket.on('message', function(data) {
+         console.log('Incoming message:', data);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Phone</title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport'/>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      form {
+        background: #90caf9;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        padding: 5px;
+      }
+      form input {
+        border: 0;
+        padding: 10px;
+        width: 80%;
+      }
+      form button {
+        border: none;
+        padding: 10px;
+        width: 20%;
+        float: right;
+        font-weight: bold;
+        color: #fff;
+        background: #64B5F6;
+      }
+      #sessionId {
+        font-size: 100px;
+        font-family: monospace;
+        color: #cecece;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sessionId">Hey!</div>
+    <form action="">
+      <input id="code" placeholder="Enter Code Here" autocomplete="off" />
+      <button>JOIN</button>
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io();
+      $('form').submit(function(){
+        socket.emit('joinRoom', $('#code').val());
+        $('#code').val('');
+        return false;
+      });
+      socket.on('message', function(data) {
+         console.log('Incoming message:', data);
+      });
+      socket.on('invalid', function(data) {
+         alert(data);
+      });
+    </script>
+  </body>
+</html>
