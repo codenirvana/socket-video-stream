@@ -1,0 +1,24 @@
+{
+  "name": "socket-game",
+  "version": "1.0.0",
+  "description": "socket game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codenirvana/socket-game.git"
+  },
+  "author": "Udit Vasu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codenirvana/socket-game/issues"
+  },
+  "homepage": "https://github.com/codenirvana/socket-game#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "express-device": "^0.4.2",
+    "socket.io": "^1.7.2"
+  }
+}
