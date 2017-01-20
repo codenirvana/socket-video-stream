@@ -36,23 +36,20 @@
     <video src="" id="video" autoplay="true"></video>
     <canvas style="display: none" id="preview"></canvas>
 
-    <form action="">
+    <form action="" onsubmit="formSubmit()">
       <input id="code" placeholder="Enter Code Here" autocomplete="off" />
       <button>JOIN</button>
     </form>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
       var canvas = document.getElementById("preview");
       var context = canvas.getContext("2d");
       var video = document.getElementById("video");
       var room;
-      canvas.width  = 400;
-      canvas.height = 400;
-      context.width = canvas.width;
-      context.height = canvas.height;
+      canvas.width  = context.width = window.innerWidth;
+      canvas.height = context.height = window.innerHeight;
 
       function loadCam(stream) {
         video.src = window.URL.createObjectURL(stream);
@@ -68,23 +65,32 @@
         socket.emit('stream',room, canvas.toDataURL('image/webp'));
       }
 
+      var options = {
+        video: {
+          width: {min: window.innerWidth, max: window.innerWidth},
+          height: {min: window.innerHeight, max: window.innerHeight},
+          facingMode: 'environment'
+        }
+      };
+
       function start() {
-        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.msgGetUserMedia);
+        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
         if(navigator.getUserMedia) {
-          navigator.getUserMedia({video: true}, loadCam, loadFail);
+          navigator.getUserMedia(options, loadCam, loadFail);
         }
         setInterval(function() {
           viewVideo(video, context);
-        }, 100);
+        }, 50);
       };
 
-      $('form').submit(function(){
-        room = $('#code').val();
+      function formSubmit(e) {
+        event.preventDefault();
+        var input = document.getElementById('code');
+        room = input.value;
+        input.value = "";
         socket.emit('joinRoom', room);
-        $('#code').val('');
         start();
-        return false;
-      });
+      }
 
       socket.on('invalid', function(data) {
          alert(data);
