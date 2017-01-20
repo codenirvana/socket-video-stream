@@ -10,10 +10,19 @@ app.get('/', (req, res) => {
   res.sendFile(fileName+'.html', { root : __dirname});
 });
 
+let clients = {};
+
 io.on('connection', (socket) => {
 
-  socket.on('stream', (room, image) => {
+  clients[socket.id] = false;
+
+  socket.on('stream', (image) => {
+    const room = clients[socket.id];
     socket.in(room).broadcast.emit('stream', image);
+  });
+
+  socket.on('newRoom', (room) => {
+    socket.join(room);
   });
 
   socket.on('joinRoom', function(room) {
@@ -21,12 +30,17 @@ io.on('connection', (socket) => {
       return socket.emit('invalid', 'Invalid code');
     }
     socket.join(room);
-    io.sockets.in(room).emit('message', 'what is going on, party people?');
+    clients[socket.id] = room;
+    io.sockets.in(room).emit('joined');
   });
 
-  socket.on('newRoom', (room) => {
-    socket.join(room);
-  });
+    socket.on('disconnect', function(){
+      const room = clients[socket.id];
+      if(room) {
+        io.sockets.in(room).emit('disconnected');
+      }
+      delete clients[socket.id];
+    });
 
 });
 

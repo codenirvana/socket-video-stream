@@ -53,16 +53,15 @@
 
       function loadCam(stream) {
         video.src = window.URL.createObjectURL(stream);
-        console.log('Connected!');
       }
 
       function loadFail(stream) {
-        console.log('Failed!');
+        alert("Video Error!");
       }
 
       function viewVideo(video, context) {
         context.drawImage(video, 0, 0, context.width, context.height);
-        socket.emit('stream',room, canvas.toDataURL('image/webp'));
+        socket.emit('stream', canvas.toDataURL('image/webp'));
       }
 
       var options = {

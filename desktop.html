@@ -33,13 +33,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
     <script>
       var socket = io();
+      var img = document.getElementById("play");
+      var sessionId = document.getElementById("sessionId");
       socket.on('connect', function() {
          socket.emit('newRoom', code);
       });
+      socket.on('joined', function(){
+        sessionId.style.display = "none";
+      });
       socket.on('stream', function(image){
-        document.getElementById("sessionId").style.display = "none";
-        var img = document.getElementById("play");
         img.src = image;
+      });
+      socket.on('disconnected', function(){
+        img.src = "";
+        sessionId.style.display = "flex";
+        sessionId.innerHTML = "Disconnected!";
       });
     </script>
   </body>
