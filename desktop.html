@@ -7,7 +7,7 @@
         margin: 0;
         padding: 0;
       }
-      #sessionId {
+      #container {
         font-size: 100px;
         font-family: monospace;
         color: #cecece;
@@ -19,36 +19,48 @@
     </style>
   </head>
   <body>
-    <div id="sessionId">
-      <script type="text/javascript">
-        var code = []
-        while(code.length < 5){
-          code.push(Math.ceil(Math.random()*9));
-        }
-        code = code.join("");
-        document.write(code);
-      </script>
-    </div>
+    <div id="container"></div>
     <img id="play">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
     <script>
-      var socket = io();
-      var img = document.getElementById("play");
-      var sessionId = document.getElementById("sessionId");
-      socket.on('connect', function() {
-         socket.emit('newRoom', code);
-      });
-      socket.on('joined', function(){
-        sessionId.style.display = "none";
-      });
-      socket.on('stream', function(image){
-        img.src = image;
-      });
-      socket.on('disconnected', function(){
-        img.src = "";
-        sessionId.style.display = "flex";
-        sessionId.innerHTML = "Disconnected!";
-      });
+      (function() {
+        'use strict';
+        var socket = io();
+        var img = document.getElementById("play");
+        var container = document.getElementById("container");
+
+        function getCode() {
+          var code = []
+          while(code.length < 5){
+            code.push(Math.ceil(Math.random()*9));
+          }
+          code = code.join("");
+          return code;
+        }
+
+        container.innerHTML = getCode();
+
+        socket.on('connect', function() {
+          var code = container.innerHTML;
+          socket.emit('newRoom', code);
+        });
+        socket.on('joined', function(){
+          container.style.display = "none";
+        });
+        socket.on('stream', function(image){
+          img.src = image;
+        });
+        socket.on('disconnected', function(){
+          img.src = "";
+          container.style.display = "flex";
+          container.innerHTML = "Disconnected!";
+          setTimeout(function () {
+            var code = getCode();
+      			container.innerHTML = code;
+            socket.emit('newRoom', code);
+      		},3000);
+        });
+      })();
     </script>
   </body>
 </html>

@@ -6,7 +6,7 @@ const device = require('express-device');
 app.use(device.capture());
 
 app.get('/', (req, res) => {
-  const fileName = (req.device.type == "desktop") ? "desktop" : "phone";
+  const fileName = (req.device.type == "phone") ? "phone" : "desktop";
   res.sendFile(fileName+'.html', { root : __dirname});
 });
 
@@ -23,24 +23,25 @@ io.on('connection', (socket) => {
 
   socket.on('newRoom', (room) => {
     socket.join(room);
+    clients[socket.id] = room;
   });
 
   socket.on('joinRoom', function(room) {
     if(!(room in socket.adapter.rooms)) {
-      return socket.emit('invalid', 'Invalid code');
+      return socket.emit('invalid');
     }
     socket.join(room);
     clients[socket.id] = room;
     io.sockets.in(room).emit('joined');
   });
 
-    socket.on('disconnect', function(){
-      const room = clients[socket.id];
-      if(room) {
-        io.sockets.in(room).emit('disconnected');
-      }
-      delete clients[socket.id];
-    });
+  socket.on('disconnect', function(){
+    const room = clients[socket.id];
+    if(room) {
+      io.sockets.in(room).emit('disconnected');
+    }
+    delete clients[socket.id];
+  });
 
 });
 

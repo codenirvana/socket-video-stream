@@ -30,70 +30,97 @@
         color: #fff;
         background: #64B5F6;
       }
+      video, canvas {
+        display: none;
+      }
+      #container {
+        font-size: 3em;
+        font-family: monospace;
+        color: #cecece;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 95vh;
+      }
     </style>
   </head>
   <body>
+    <div id="container">Hey!</div>
     <video src="" id="video" autoplay="true"></video>
-    <canvas style="display: none" id="preview"></canvas>
+    <canvas id="preview"></canvas>
 
-    <form action="" onsubmit="formSubmit()">
+    <form action="">
       <input id="code" placeholder="Enter Code Here" autocomplete="off" />
       <button>JOIN</button>
     </form>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
     <script>
-      var socket = io();
-      var canvas = document.getElementById("preview");
-      var context = canvas.getContext("2d");
-      var video = document.getElementById("video");
-      var room;
-      canvas.width  = context.width = window.innerWidth;
-      canvas.height = context.height = window.innerHeight;
-
-      function loadCam(stream) {
-        video.src = window.URL.createObjectURL(stream);
-      }
-
-      function loadFail(stream) {
-        alert("Video Error!");
-      }
-
-      function viewVideo(video, context) {
-        context.drawImage(video, 0, 0, context.width, context.height);
-        socket.emit('stream', canvas.toDataURL('image/webp'));
-      }
-
-      var options = {
-        video: {
-          width: {min: window.innerWidth, max: window.innerWidth},
-          height: {min: window.innerHeight, max: window.innerHeight},
-          facingMode: 'environment'
-        }
-      };
-
-      function start() {
-        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-        if(navigator.getUserMedia) {
-          navigator.getUserMedia(options, loadCam, loadFail);
-        }
-        setInterval(function() {
-          viewVideo(video, context);
-        }, 50);
-      };
-
-      function formSubmit(e) {
-        event.preventDefault();
+      (function() {
+        'use strict';
+        var socket = io();
+        var canvas = document.getElementById("preview");
+        var context = canvas.getContext("2d");
+        var video = document.getElementById("video");
         var input = document.getElementById('code');
-        room = input.value;
-        input.value = "";
-        socket.emit('joinRoom', room);
-        start();
-      }
+        var form = document.querySelector('form');
 
-      socket.on('invalid', function(data) {
-         alert(data);
-      });
+        var MediaStream;
+        var options = {
+          video: {
+            width: {min: window.innerWidth, max: window.innerWidth},
+            height: {min: window.innerHeight, max: window.innerHeight},
+            facingMode: 'environment'  // not working
+          }
+        };
+
+        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+        canvas.width  = context.width = window.innerWidth;
+        canvas.height = context.height = window.innerHeight;
+
+        function loadCam(stream) {
+          video.src = window.URL.createObjectURL(stream);
+          MediaStream = stream.getTracks()[0];
+        }
+
+        function loadFail(stream) {
+          alert("Video Error!");
+        }
+
+        function viewVideo(video, context) {
+          context.drawImage(video, 0, 0, context.width, context.height);
+          socket.emit('stream', canvas.toDataURL('image/webp'));
+        }
+
+        function formSubmit(e) {
+          e.preventDefault();
+          socket.emit('joinRoom', input.value);
+          input.value = "";
+        }
+
+        form.addEventListener('submit', formSubmit, false);
+
+        socket.on('joined', function() {
+          if(!navigator.getUserMedia) {
+            return alert("Browser is not supported!");
+          }
+          navigator.getUserMedia(options, loadCam, loadFail);
+          video.style.display = "block";
+          container.style.display = "none";
+          setInterval(function() {
+            viewVideo(video, context);
+          }, 10);
+        });
+        socket.on('invalid', function() {
+           alert("Invalid Code!");
+        });
+        socket.on('disconnected', function(){
+          MediaStream.stop();
+          container.innerHTML = "Disconnected!";
+          container.style.display = "flex";
+          video.style.display = "none";
+        });
+      })();
     </script>
   </body>
 </html>
