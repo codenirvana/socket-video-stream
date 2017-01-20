@@ -29,14 +29,17 @@
         document.write(code);
       </script>
     </div>
+    <img id="play">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
     <script>
       var socket = io();
       socket.on('connect', function() {
          socket.emit('newRoom', code);
       });
-      socket.on('message', function(data) {
-         console.log('Incoming message:', data);
+      socket.on('stream', function(image){
+        document.getElementById("sessionId").style.display = "none";
+        var img = document.getElementById("play");
+        img.src = image;
       });
     </script>
   </body>

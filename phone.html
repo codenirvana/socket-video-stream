@@ -30,19 +30,12 @@
         color: #fff;
         background: #64B5F6;
       }
-      #sessionId {
-        font-size: 100px;
-        font-family: monospace;
-        color: #cecece;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 90vh;
-      }
     </style>
   </head>
   <body>
-    <div id="sessionId">Hey!</div>
+    <video src="" id="video" autoplay="true"></video>
+    <canvas style="display: none" id="preview"></canvas>
+
     <form action="">
       <input id="code" placeholder="Enter Code Here" autocomplete="off" />
       <button>JOIN</button>
@@ -52,14 +45,47 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
+      var canvas = document.getElementById("preview");
+      var context = canvas.getContext("2d");
+      var video = document.getElementById("video");
+      var room;
+      canvas.width  = 400;
+      canvas.height = 400;
+      context.width = canvas.width;
+      context.height = canvas.height;
+
+      function loadCam(stream) {
+        video.src = window.URL.createObjectURL(stream);
+        console.log('Connected!');
+      }
+
+      function loadFail(stream) {
+        console.log('Failed!');
+      }
+
+      function viewVideo(video, context) {
+        context.drawImage(video, 0, 0, context.width, context.height);
+        socket.emit('stream',room, canvas.toDataURL('image/webp'));
+      }
+
+      function start() {
+        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.msgGetUserMedia);
+        if(navigator.getUserMedia) {
+          navigator.getUserMedia({video: true}, loadCam, loadFail);
+        }
+        setInterval(function() {
+          viewVideo(video, context);
+        }, 100);
+      };
+
       $('form').submit(function(){
-        socket.emit('joinRoom', $('#code').val());
+        room = $('#code').val();
+        socket.emit('joinRoom', room);
         $('#code').val('');
+        start();
         return false;
       });
-      socket.on('message', function(data) {
-         console.log('Incoming message:', data);
-      });
+
       socket.on('invalid', function(data) {
          alert(data);
       });

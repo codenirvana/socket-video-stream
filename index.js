@@ -7,9 +7,16 @@ app.use(device.capture());
 
 app.get('/', (req, res) => {
   res.sendFile(req.device.type+'.html', { root : __dirname});
+  // res.sendFile('index.html', { root : __dirname});
 });
 
 io.on('connection', (socket) => {
+
+  socket.on('stream', (room, image) => {
+    // const room = socket.manager.roomClients[socket.id];
+    // console.log(io.sockets.adapter.sids[socket.id]);
+    socket.in(room).broadcast.emit('stream', image);
+  });
 
   socket.on('joinRoom', function(room) {
     if(!(room in socket.adapter.rooms)) {
