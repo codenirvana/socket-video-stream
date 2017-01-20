@@ -6,15 +6,13 @@ const device = require('express-device');
 app.use(device.capture());
 
 app.get('/', (req, res) => {
-  res.sendFile(req.device.type+'.html', { root : __dirname});
-  // res.sendFile('index.html', { root : __dirname});
+  const fileName = (req.device.type == "desktop") ? "desktop" : "phone";
+  res.sendFile(fileName+'.html', { root : __dirname});
 });
 
 io.on('connection', (socket) => {
 
   socket.on('stream', (room, image) => {
-    // const room = socket.manager.roomClients[socket.id];
-    // console.log(io.sockets.adapter.sids[socket.id]);
     socket.in(room).broadcast.emit('stream', image);
   });
 
