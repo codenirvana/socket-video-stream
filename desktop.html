@@ -19,15 +19,17 @@
     </style>
   </head>
   <body>
-    <div id="container"></div>
-    <img id="play">
+    <div id="container">
+      <span id="roomId"></span>
+      <img id="play">
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
     <script>
       (function() {
         'use strict';
         var socket = io();
         var img = document.getElementById("play");
-        var container = document.getElementById("container");
+        var roomId = document.getElementById("roomId");
 
         function getCode() {
           var code = []
@@ -38,25 +40,25 @@
           return code;
         }
 
-        container.innerHTML = getCode();
+        roomId.innerHTML = getCode();
 
         socket.on('connect', function() {
-          var code = container.innerHTML;
+          var code = roomId.innerHTML;
           socket.emit('newRoom', code);
         });
         socket.on('joined', function(){
-          container.style.display = "none";
+          roomId.style.display = "none";
         });
         socket.on('stream', function(image){
           img.src = image;
         });
         socket.on('disconnected', function(){
           img.src = "";
-          container.style.display = "flex";
-          container.innerHTML = "Disconnected!";
+          roomId.style.display = "flex";
+          roomId.innerHTML = "Disconnected!";
           setTimeout(function () {
             var code = getCode();
-      			container.innerHTML = code;
+      			roomId.innerHTML = code;
             socket.emit('newRoom', code);
       		},3000);
         });
