@@ -65,7 +65,7 @@
         var input = document.getElementById('code');
         var form = document.querySelector('form');
 
-        var MediaStream;
+        var MediaStream, LOOP;
         var options = {
           video: {
             width: {min: window.innerWidth, max: window.innerWidth},
@@ -107,7 +107,8 @@
           navigator.getUserMedia(options, loadCam, loadFail);
           video.style.display = "block";
           container.style.display = "none";
-          setInterval(function() {
+          clearInterval(LOOP);
+          LOOP = setInterval(function() {
             viewVideo(video, context);
           }, 10);
         });
