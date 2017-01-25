@@ -1,7 +1,7 @@
 {
-  "name": "socket-game",
+  "name": "socket-video-stream",
   "version": "1.0.0",
-  "description": "socket game",
+  "description": "Live video streaming using socket.io",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
