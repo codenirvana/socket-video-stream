@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/codenirvana/socket-game.git"
+    "url": "git+https://github.com/codenirvana/socket-video-stream.git"
   },
   "author": "Udit Vasu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/codenirvana/socket-game/issues"
+    "url": "https://github.com/codenirvana/socket-video-stream/issues"
   },
-  "homepage": "https://github.com/codenirvana/socket-game#readme",
+  "homepage": "https://github.com/codenirvana/socket-video-stream#readme",
   "dependencies": {
     "express": "^4.14.0",
     "express-device": "^0.4.2",
