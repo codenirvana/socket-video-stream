@@ -1,3 +1,3 @@
-# socket-game
+# socket-video-stream
 
-Testing web-socket and orientation API
+Live video streaming using socket.io
